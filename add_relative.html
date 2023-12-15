@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Relative</title>
+    <!-- <script src="app.js"></script> -->
 </head>
 
 <body>
@@ -18,15 +19,24 @@
         <label for="father_name">Relative's Mother's Name:</label>
         <input type="text" id="father_name" name="father_name">
 
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+        </select>
+
         <label for="relationship">Relationship:</label>
         <select id="relationship" name="relationship">
             <option value="father">Father</option>
             <option value="mother">Mother</option>
-            <option value="uncle">Uncle</option>
-            <option value="aunt">Aunt</option>
+            <option value="maternal_uncle">Maternal Uncle</option>
+            <option value="maternal_aunt">Maternal Aunt</option>
+            <option value="paternal_uncle">Paternal Uncle</option>
+            <option value="paternal_aunt">Paternal Aunt</option>
             <option value="child">Child</option>
             <option value="nephew">Nephew/Niece</option>
-            <option value="brother">Brother/Sister</option>
+            <option value="sibling">Brother/Sister</option>
+            <option value="partner">Partner</option>
         </select>
 
         <button type="submit">Add Relative</button>
