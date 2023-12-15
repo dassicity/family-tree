@@ -1,4 +1,4 @@
-let level = 0;
+let root_level = 0;
 let lowest_level;
 let highest_level;
 let root_user;
@@ -52,10 +52,19 @@ document.querySelector('#new_user').addEventListener('submit', function (e) {
     e.preventDefault();
     let name = document.querySelector('#user_name').value.trim();
     let gender = document.querySelector('#gender').value;
-    let level = level;
+    let level = root_level;
 
     let user = new User(name, level, gender);
     Users.push(user);
+});
+
+document.querySelector('#existing_user').addEventListener('submit', function (e) {
+    e.preventDefault();
+    let name = document.querySelector('#user_name').value.trim();
+    let gender = document.querySelector('#gender').value;
+    let level = root_level;
+
+    root_user = find_or_create_person(name, gender, level);
 });
 
 document.querySelector('#relative_input').addEventListener('submit', function (e) {
@@ -70,35 +79,35 @@ document.querySelector('#relative_input').addEventListener('submit', function (e
     switch (relationship) {
         case 'father':
         case 'mother':
-            user = find_or_create_person(name, gender, level - 1);
+            user = find_or_create_person(name, gender, root_level - 1);
             add_parent(user);
-            lowest_level = level - 1;
+            lowest_level = root_level - 1;
             break;
 
         case 'child':
-            user = find_or_create_person(name, gender, level + 1);
+            user = find_or_create_person(name, gender, root_level + 1);
             add_child(user);
-            highest_level = level + 1;
+            highest_level = root_level + 1;
             break;
         case 'maternal_uncle':
         case 'maternal_aunt':
-            user = find_or_create_person(name, gender, level - 1);
+            user = find_or_create_person(name, gender, root_level - 1);
             add_maternal_uncle(user);
-            lowest_level = level - 1;
+            lowest_level = root_level - 1;
             break;
         case 'paternal_uncle':
         case 'paternal_aunt':
-            user = find_or_create_person(name, gender, level - 1);
+            user = find_or_create_person(name, gender, root_level - 1);
             add_paternal_uncle(user);
-            lowest_level = level - 1;
+            lowest_level = root_level - 1;
             break;
         case 'sibling':
-            user = find_or_create_person(name, gender, level);
+            user = find_or_create_person(name, gender, root_level);
             add_sibling(user);
             break;
 
         case 'partner':
-            user = find_or_create_person(name, gender, level);
+            user = find_or_create_person(name, gender, root_level);
             add_partner(user);
             break;
     }
@@ -120,12 +129,28 @@ function add_child(child) {
     update_user(child);
 }
 
-function add_maternal_uncle(user) {
+function add_maternal_uncle(uncle) {
+    let mother = root_user.parents[0].gender === 'male' ? root_user.parents[0] : root_user.parents[1];
 
+    let grand_parent1 = mother.parents[0];
+    let grand_parent2 = mother.parents[1];
+
+    grand_parent1.children = [...grand_parent1.children, uncle];
+    grand_parent2.children = [...grand_parent2.children, uncle];
+
+    uncle.parents = [grand_parent1, grand_parent2];
 }
 
-function add_paternal_uncle(user) {
+function add_paternal_uncle(uncle) {
+    let father = root_user.parents[0].gender === 'female' ? root_user.parents[0] : root_user.parents[1];
 
+    let grand_parent1 = father.parents[0];
+    let grand_parent2 = father.parents[1];
+
+    grand_parent1.children = [...grand_parent1.children, uncle];
+    grand_parent2.children = [...grand_parent2.children, uncle];
+
+    uncle.parents = [grand_parent1, grand_parent2];
 }
 
 function add_sibling(sibling) {
