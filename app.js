@@ -1,10 +1,11 @@
-let root_level = 0;
-let lowest_level;
-let highest_level;
-let root_user;
+let root_level = 0; // The user's level
+let lowest_level;   // Lowest level or the level of the oldest member in the family
+let highest_level;  // Highest level or the level of the youngest memeber
+let root_user;  // Used to store the current user
 
-let Users = [];
+let Users = []; // Mock database to store the list of users
 
+// The User class
 class User {
     constructor(name, level, gender) {
         this.name = name;
@@ -15,19 +16,9 @@ class User {
         this.parents = [];
     }
 
-    add_partner(partner) {
-        this.partner = partner;
-    }
-
-    add_children(children) {
-        this.children = [...this.children, ...children];
-    }
-
-    add_parents(parents) {
-        this.parents = [...this.parents, ...parents];
-    }
 }
 
+// Function to update the state of a user - mainly the field that were changed during modification
 function update_user(user) {
     let user_to_update = Users.find(u => u.name === user.name);
 
@@ -36,28 +27,31 @@ function update_user(user) {
     user_to_update.parents = user.parents;
 }
 
+// Function to create a person or if it exists , to find it's object instance
 function find_or_create_person(name, gender, level) {
-    let user = Users.find(u => u.name === name);
+    let user = Users.find(u => u.name === name);    // Checking if the name exists 
     if (!user) {
         user = new User(name, level, gender);
         Users.push(user);
     }
 
-    root_user = user;
-    level = root_user.level;
+    root_user = user;   // Updating the root user
+    level = root_user.level;    // Updating the root level
     return user;
 }
 
+// Query selector and event listener for when a new user registers
 document.querySelector('#new_user').addEventListener('submit', function (e) {
     e.preventDefault();
     let name = document.querySelector('#user_name').value.trim();
     let gender = document.querySelector('#gender').value;
     let level = root_level;
 
-    let user = new User(name, level, gender);
-    Users.push(user);
+    let user = new User(name, level, gender);   // Creating the User type instance
+    Users.push(user);   // Pushing into the mock database
 });
 
+// Query selector and event listener for when an existing user registers
 document.querySelector('#existing_user').addEventListener('submit', function (e) {
     e.preventDefault();
     let name = document.querySelector('#user_name').value.trim();
@@ -67,6 +61,7 @@ document.querySelector('#existing_user').addEventListener('submit', function (e)
     root_user = find_or_create_person(name, gender, level);
 });
 
+// For when a user wants to add any of their relative
 document.querySelector('#relative_input').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -76,6 +71,7 @@ document.querySelector('#relative_input').addEventListener('submit', function (e
 
     let user;
 
+    // Switch case for various relationship types
     switch (relationship) {
         case 'father':
         case 'mother':
@@ -113,6 +109,7 @@ document.querySelector('#relative_input').addEventListener('submit', function (e
     }
 });
 
+// Updating the parents field in the root user and the children field in the parent user
 function add_parent(parent) {
     root_user.parents = [...root_user.parents, parent];
     parent.children = [...parent.children, root_user];
@@ -121,6 +118,7 @@ function add_parent(parent) {
     update_user(parent);
 }
 
+// Updating the children field in the root user and the parent field in the child user
 function add_child(child) {
     root_user.children = [...root_user.children, child];
     child.parents = [...child.parents, root_user];
@@ -129,6 +127,8 @@ function add_child(child) {
     update_user(child);
 }
 
+// In this method, we find the mother and then her parents. And then add the uncle/aunt as a children to that parent as there are no siblings field in the User class
+// Sibling field was not included as there are no lines visualized with brothers or sisters in a family tree. All links are made to parents.
 function add_maternal_uncle(uncle) {
     let mother = root_user.parents[0].gender === 'male' ? root_user.parents[0] : root_user.parents[1];
 
@@ -141,6 +141,7 @@ function add_maternal_uncle(uncle) {
     uncle.parents = [grand_parent1, grand_parent2];
 }
 
+// In this method, we find the father and then his parents. And then add the uncle/aunt as a children to that parent as there are no siblings field in the User class
 function add_paternal_uncle(uncle) {
     let father = root_user.parents[0].gender === 'female' ? root_user.parents[0] : root_user.parents[1];
 
@@ -153,6 +154,7 @@ function add_paternal_uncle(uncle) {
     uncle.parents = [grand_parent1, grand_parent2];
 }
 
+// In this method we find the parent and add the sibling as a children to that parent
 function add_sibling(sibling) {
     let parent = root_user.parents;
     let parent1 = parent[0];
@@ -168,6 +170,7 @@ function add_sibling(sibling) {
     update_user(sibling);
 }
 
+// we just modify the partner attribute in this method
 function add_partner(partner) {
 
     root_user.partner = partner;
